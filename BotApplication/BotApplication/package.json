@@ -1,0 +1,12 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "hearthstone-db": "latest"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
+}
