@@ -1,4 +1,6 @@
-﻿using BotApplication.Strategies;
+﻿using System.Collections.Generic;
+using BotApplication.Strategies;
+using BotApplication.Strategies.Interfaces;
 
 namespace BotApplication.Cards.Interfaces
 {
@@ -9,6 +11,6 @@ namespace BotApplication.Cards.Interfaces
 
         long Id { get; }
 
-        IPlayStrategy PlayStrategy { get; }
+        IReadOnlyCollection<IPlayStrategy> PlayStrategies { get; }
     }
 }

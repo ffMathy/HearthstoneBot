@@ -4,7 +4,7 @@ using BotApplication.Cards.Interfaces;
 
 namespace BotApplication.Cards
 {
-    class ImageConverter : IImageConverter
+    internal class ImageConverter : IImageConverter
     {
         public Bitmap ConvertToFormat(Image image, PixelFormat format)
         {

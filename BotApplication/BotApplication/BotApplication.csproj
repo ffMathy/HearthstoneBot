@@ -88,17 +88,27 @@
     <Compile Include="Cards\Interfaces\ICardAggregator.cs" />
     <Compile Include="Cards\Interfaces\ICardImageService.cs" />
     <Compile Include="Cards\Interfaces\IImageConverter.cs" />
+    <Compile Include="Helpers\Interfaces\IOcrHelper.cs" />
+    <Compile Include="Helpers\OcrHelper.cs" />
+    <Compile Include="Interceptors\AggregateInterceptor.cs" />
+    <Compile Include="Interceptors\EnemyPlayInterceptor.cs" />
+    <Compile Include="Interceptors\Interfaces\IAggregateInterceptor.cs" />
+    <Compile Include="Interceptors\Interfaces\IOcrInterceptor.cs" />
+    <Compile Include="Interceptors\Interfaces\IInterceptor.cs" />
+    <Compile Include="Interceptors\Interfaces\IStandardInterceptor.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Players\Interfaces\ILocalPlayer.cs" />
-    <Compile Include="Players\Interfaces\IPlayer.cs" />
+    <Compile Include="State\EnemyPlayer.cs" />
+    <Compile Include="State\Interfaces\IEnemyPlayer.cs" />
+    <Compile Include="State\Interfaces\ILocalPlayer.cs" />
+    <Compile Include="State\Interfaces\IPlayer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Strategies\IPlayStrategy.cs" />
+    <Compile Include="Strategies\Interfaces\IPlayStrategy.cs" />
     <EmbeddedResource Include="MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -126,7 +136,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="tessdata\eng.traineddata" />
+    <None Include="tessdata\eng.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="tessdata\hearthstone.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="tessdata\osd.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

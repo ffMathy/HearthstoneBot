@@ -8,7 +8,7 @@ using BotApplication.Cards.Interfaces;
 
 namespace BotApplication.Cards
 {
-    class CardImageService : ICardImageService
+    internal class CardImageService : ICardImageService
     {
         private readonly string _cardImageDirectory;
 
@@ -133,11 +133,17 @@ namespace BotApplication.Cards
 
         private static Bitmap CropCardImage(Image image)
         {
-            var newWidth = image.Width / 100d * 65;
-            var newHeight = image.Height / 100d * 28;
+            //var newWidth = image.Width / 100d * 65;
+            //var newHeight = image.Height / 100d * 28;
 
-            var offsetX = image.Width / 100d * 15;
-            var offsetY = image.Height / 100d * 22;
+            //var offsetX = image.Width / 100d * 15;
+            //var offsetY = image.Height / 100d * 22;
+
+            var newWidth = image.Width;
+            var newHeight = image.Height;
+
+            const int offsetX = 0;
+            const int offsetY = 0;
 
             var copy = new Bitmap((int)newWidth, (int)newHeight, image.PixelFormat);
 

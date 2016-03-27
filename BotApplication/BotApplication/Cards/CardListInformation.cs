@@ -1,6 +1,6 @@
 ﻿namespace BotApplication.Cards
 {
-    class CardListInformation
+    internal class CardListInformation
     {
         public Card[] Cards { get; set; }
     }

@@ -6,5 +6,7 @@ namespace BotApplication.Cards.Interfaces
     public interface ICardAggregator
     {
         Task<IReadOnlyList<ICard>> LoadCardsAsync();
+
+        Task<ICard> GetCardByNameAsync(string name);
     }
 }

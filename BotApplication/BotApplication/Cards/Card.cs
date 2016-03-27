@@ -1,10 +1,12 @@
-﻿using BotApplication.Cards.Interfaces;
+﻿using System.Collections.Generic;
+using BotApplication.Cards.Interfaces;
 using BotApplication.Strategies;
+using BotApplication.Strategies.Interfaces;
 using Newtonsoft.Json;
 
 namespace BotApplication.Cards
 {
-    class Card: ICard
+    internal class Card: ICard
     {
         public Card(
             string name, 
@@ -23,6 +25,6 @@ namespace BotApplication.Cards
 
         public long Id { get; }
 
-        public IPlayStrategy PlayStrategy { get; set; }
+        public IReadOnlyCollection<IPlayStrategy> PlayStrategies { get; set; }
     }
 }
