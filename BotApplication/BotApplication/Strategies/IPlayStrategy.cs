@@ -3,13 +3,12 @@ using BotApplication.Players.Interfaces;
 
 namespace BotApplication.Strategies
 {
-    public interface IPlayStrategy<in TCard>
-        where TCard: ICard<TCard>
+    public interface IPlayStrategy
     {
         double CalculateAttackScore(
             ILocalPlayer localPlayer,
             IPlayer enemyPlayer,
-            TCard target);
+            ICard target);
 
         double CalculatePlayScore(
             ILocalPlayer localPlayer,

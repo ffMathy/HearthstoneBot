@@ -4,10 +4,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autofac;
+using BotApplication.Cards.Interfaces;
 
 namespace BotApplication
 {
-    static class Program
+    class Program
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -21,11 +23,16 @@ namespace BotApplication
         {
             AllocConsole();
 
+            var builder = new ContainerBuilder();
+            builder.RegisterAssemblyTypes(typeof (Program).Assembly)
+                .AsSelf()
+                .AsImplementedInterfaces();
 
+            var container = builder.Build();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWindow());
+            Application.Run(container.Resolve<MainWindow>());
         }
     }
 }
