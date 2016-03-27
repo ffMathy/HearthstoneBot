@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AForge.Imaging;
 using BotApplication.Cards.Interfaces;
+using Image = System.Drawing.Image;
 
 namespace BotApplication
 {
@@ -15,6 +19,7 @@ namespace BotApplication
     {
         private readonly ICardAggregator _cardAggregator;
         private readonly ICardImageService _cardImageService;
+        private readonly IImageConverter _imageConverter;
 
         private MainWindow()
         {
@@ -23,10 +28,12 @@ namespace BotApplication
 
         public MainWindow(
             ICardAggregator cardAggregator,
-            ICardImageService cardImageService)
+            ICardImageService cardImageService,
+            IImageConverter imageConverter)
         {
             _cardAggregator = cardAggregator;
             _cardImageService = cardImageService;
+            _imageConverter = imageConverter;
 
             Load += MainWindow_Load;
 
@@ -40,12 +47,6 @@ namespace BotApplication
             var cards = await _cardAggregator.LoadCardsAsync();
 
             Console.WriteLine("Loaded " + cards.Count + " cards.");
-            Console.WriteLine("Fetching card images.");
-
-            var cardImageTasks = cards.Select(_cardImageService.GetCardImageAsync);
-            var cardImages = await Task.WhenAll(cardImageTasks);
-
-            Console.WriteLine("Done fetching card images.");
         }
     }
 }

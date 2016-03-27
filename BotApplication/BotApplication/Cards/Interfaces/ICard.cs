@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using BotApplication.Strategies;
+﻿using BotApplication.Strategies;
 
 namespace BotApplication.Cards.Interfaces
 {
