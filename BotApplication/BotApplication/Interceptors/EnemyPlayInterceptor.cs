@@ -11,16 +11,16 @@ namespace BotApplication.Interceptors
     public class EnemyPlayInterceptor: IInterceptor
     {
         private readonly IEnemyPlayer _enemyPlayer;
-        private readonly ICardScanner _cardScanner;
+        private readonly ICardImageScanner _cardImageScanner;
         private readonly IGameState _gameState;
 
         public EnemyPlayInterceptor(
             IEnemyPlayer enemyPlayer,
-            ICardScanner cardScanner,
+            ICardImageScanner cardImageScanner,
             IGameState gameState)
         {
             _enemyPlayer = enemyPlayer;
-            _cardScanner = cardScanner;
+            _cardImageScanner = cardImageScanner;
             _gameState = gameState;
         }
 
@@ -29,10 +29,11 @@ namespace BotApplication.Interceptors
             if (_gameState.IsGameStarted)
             {
                 var card =
-                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(standardImage, new Point(359, 347));
-                if (card != null)
+                    await _cardImageScanner.InferPlayedCardFromImageCardLocationAsync(standardImage, new Point(359, 347));
+                if (card.Match != null)
                 {
-                    await _enemyPlayer.AddCardPlayedAsync(card);
+                    _enemyPlayer.AddCardPlayed(card.Match);
+                    await Task.Delay(2000);
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using AForge;
+using AForge.Imaging;
 
 namespace BotApplication.Helpers.Interfaces
 {
@@ -8,8 +9,8 @@ namespace BotApplication.Helpers.Interfaces
         Bitmap CropBitmap(Bitmap input, Rectangle region);
         Bitmap ResizeBitmap(Bitmap bitmap, Size newSize);
 
-        Bitmap ExcludeColorsOutsideRange(Bitmap image, Rectangle region, IntRange universalRange);
-        Bitmap ExcludeColorsOutsideRange(Bitmap image, Rectangle region, IntRange redRange, IntRange greenRange, IntRange blueRange);
+        Bitmap ExcludeColorsOutsideRange(Bitmap image, Rectangle region, IntRange universalRange, RGB fillColor = null);
+        Bitmap ExcludeColorsOutsideRange(Bitmap image, Rectangle region, IntRange redRange, IntRange greenRange, IntRange blueRange, RGB fillColor = null);
 
         Bitmap IncreaseContrast(Bitmap image, Rectangle region, int factor);
 

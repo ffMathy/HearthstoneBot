@@ -20,9 +20,13 @@ namespace BotApplication.Helpers
 
         public void LogGameEvent(string text)
         {
-            Console.WriteLine(text);
-            Debug.WriteLine(text);
+            LogDebugEvent(text);
             _synthesizer.SpeakAsync(text);
+        }
+
+        public void LogDebugEvent(string text)
+        {
+            Console.WriteLine(text);
         }
     }
 }

@@ -9,16 +9,16 @@ namespace BotApplication.Interceptors
     public class LocalCardDrawnInterceptor: IInterceptor
     {
         private readonly ILocalPlayer _localPlayer;
-        private readonly ICardScanner _cardScanner;
+        private readonly ICardImageScanner _cardImageScanner;
         private readonly IGameState _gameState;
 
         public LocalCardDrawnInterceptor(
             ILocalPlayer localPlayer,
-            ICardScanner cardScanner,
+            ICardImageScanner cardImageScanner,
             IGameState gameState)
         {
             _localPlayer = localPlayer;
-            _cardScanner = cardScanner;
+            _cardImageScanner = cardImageScanner;
             _gameState = gameState;
         }
 
@@ -27,10 +27,11 @@ namespace BotApplication.Interceptors
             if (_gameState.IsGameStarted)
             {
                 var card =
-                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(standardImage, new Point(1540, 456));
-                if (card != null)
+                    await _cardImageScanner.InferPlayedCardFromImageCardLocationAsync(standardImage, new Point(1540, 456));
+                if (card.Match != null)
                 {
-                    await _localPlayer.AddCardToHandAsync(card);
+                    _localPlayer.AddCardToHand(card.Match);
+                    await Task.Delay(2000);
                 }
             }
         }

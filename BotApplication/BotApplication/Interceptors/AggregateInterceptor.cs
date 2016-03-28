@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AForge;
 using AForge.Imaging.Filters;
+using BotApplication.Helpers.Interfaces;
 using BotApplication.Interceptors.Interfaces;
 using Parallel = System.Threading.Tasks.Parallel;
 using Point = System.Drawing.Point;
@@ -19,6 +20,19 @@ namespace BotApplication.Interceptors
     public class AggregateInterceptor : IAggregateInterceptor
     {
         private readonly IEnumerable<IInterceptor> _interceptors;
+        private readonly ILogger _logger;
+
+        private Bitmap _currentImage;
+
+        public Bitmap CurrentImage
+        {
+            get { return _currentImage; }
+            private set
+            {
+                //_currentImage?.Dispose();
+                _currentImage = new Bitmap(value);
+            }
+        }
 
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
@@ -27,9 +41,11 @@ namespace BotApplication.Interceptors
         static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
         public AggregateInterceptor(
-            IEnumerable<IInterceptor> interceptors)
+            IEnumerable<IInterceptor> interceptors,
+            ILogger logger)
         {
             _interceptors = interceptors;
+            _logger = logger;
         }
 
         private static string GetActiveWindowTitle()
@@ -55,7 +71,7 @@ namespace BotApplication.Interceptors
             {
                 while (true)
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(10);
                     try
                     {
                         if (GetActiveWindowTitle() == "Hearthstone")
@@ -69,6 +85,7 @@ namespace BotApplication.Interceptors
                                     graphics.CopyFromScreen(new Point(0, titleBarHeight), Point.Empty, bounds.Size);
                                 }
                                 await PostFrame(bitmap);
+                                CurrentImage = bitmap;
                             }
                         }
                     }

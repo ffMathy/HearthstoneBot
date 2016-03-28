@@ -7,22 +7,20 @@ namespace BotApplication.Helpers.Interfaces
 {
     public interface IOcrHelper
     {
-        string GetTextInRegion(
+        OcrResult GetTextInRegion(
             Bitmap image,
             Rect region);
 
-        string GetTextInRegion(
+        OcrResult GetTextInRegion(
             Bitmap image,
             Rect region,
             PageSegMode pageSegmentationMode);
 
-        string GetText(
+        OcrResult GetText(
             Bitmap image);
 
-        string GetText(
+        OcrResult GetText(
             Bitmap image,
             PageSegMode pageSegmentationMode);
-
-        event EventHandler<OcrTextScanPerformedEventArgs> OcrTextScanPerformed;
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BotApplication.Cards.Interfaces;
+using BotApplication.Helpers.Interfaces;
 using BotApplication.Strategies.Interfaces;
 using Newtonsoft.Json;
 
@@ -12,13 +13,16 @@ namespace BotApplication.Cards
     internal class CardAggregator: ICardAggregator
     {
         private readonly IEnumerable<IPlayStrategy> _playStrategies;
+        private readonly ILogger _logger;
 
         private IReadOnlyList<ICard> _cards; 
 
         public CardAggregator(
-            IEnumerable<IPlayStrategy> playStrategies)
+            IEnumerable<IPlayStrategy> playStrategies,
+            ILogger logger)
         {
             _playStrategies = playStrategies;
+            _logger = logger;
         }
 
         public async Task<IReadOnlyList<ICard>> LoadCardsAsync()
@@ -63,7 +67,7 @@ namespace BotApplication.Cards
                 await LoadCardsAsync();
             }
 
-            name = name?.Trim().Replace(" ", "").Replace("\r", "").Replace("\n", "").Replace("\t", "");
+            name = SanitizeName(name);
 
             var orderedCards = _cards
                 .OrderBy(x => DamerauLevenshteinDistance(name, x.Name))
@@ -78,15 +82,32 @@ namespace BotApplication.Cards
             if (cards.Length == 0)
             {
                 var bestFailedCandidate = orderedCards.First();
-                Console.WriteLine("Best failed candidate for \"" + name + "\" was " + bestFailedCandidate.Name + " with a distance of " + DamerauLevenshteinDistance(name, bestFailedCandidate.Name));
+                _logger.LogDebugEvent("Best failed candidate for \"" + name + "\" was " + bestFailedCandidate.Name +
+                                  " with a distance of " + DamerauLevenshteinDistance(name, bestFailedCandidate.Name));
+            }
+            else
+            {
+                _logger.LogDebugEvent("Top 3 matches for \"" + name + "\" was:");
+                foreach (var card in orderedCards.Take(3))
+                {
+                    _logger.LogDebugEvent("\t" + card.Name);
+                }
             }
 
             return cards;
         }
 
+        private static string SanitizeName(string name)
+        {
+            return name?.Trim().Replace("\r", "").Replace("\n", "").Replace("\t", "");
+        }
+
 
         public static int DamerauLevenshteinDistance(string string1, string string2)
         {
+            string1 = SanitizeName(string1);
+            string2 = SanitizeName(string2);
+
             if (string.IsNullOrEmpty(string1))
             {
                 return !string.IsNullOrEmpty(string2) ? string2.Length : 0;

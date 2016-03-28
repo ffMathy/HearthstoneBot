@@ -38,7 +38,7 @@ namespace BotApplication
         {
             image.Save(_offset++ + ".png");
             Images.Enqueue(image);
-            Thread.Sleep(250);
+            Thread.Sleep(1000);
             Application.DoEvents();
         }
 

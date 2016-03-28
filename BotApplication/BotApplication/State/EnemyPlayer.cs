@@ -23,11 +23,10 @@ namespace BotApplication.State
             _cardsPlayed = new List<ICard>();
         }
 
-        public async Task AddCardPlayedAsync(ICard card)
+        public void AddCardPlayed(ICard card)
         {
             _cardsPlayed.Add(card);
             _logger.LogGameEvent(card.Name + " played by the enemy.");
-            await Task.Delay(2000);
         }
     }
 }

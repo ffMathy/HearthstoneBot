@@ -1,5 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Diagnostics;
+using System.Drawing;
 using AForge;
+using AForge.Imaging;
 using AForge.Imaging.Filters;
 using BotApplication.Helpers.Interfaces;
 
@@ -9,16 +12,27 @@ namespace BotApplication.Helpers
     {
         public Bitmap CropBitmap(Bitmap input, Rectangle region)
         {
-            var target = new Bitmap(region.Width, region.Height);
-
-            using (var graphics = Graphics.FromImage(target))
+            try
             {
-                graphics.DrawImage(input, new Rectangle(0, 0, target.Width, target.Height),
-                                 region,
-                                 GraphicsUnit.Pixel);
-            }
+                var target = new Bitmap(region.Width, region.Height);
 
-            return target;
+                using (var graphics = Graphics.FromImage(target))
+                {
+                    graphics.DrawImage(input, new Rectangle(0, 0, target.Width, target.Height),
+                        region,
+                        GraphicsUnit.Pixel);
+                }
+
+                return target;
+            }
+            catch (Exception ex)
+            {
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+                throw;
+            }
         }
 
         public Bitmap ResizeBitmap(Bitmap input, Size newSize)
@@ -34,21 +48,24 @@ namespace BotApplication.Helpers
             return target;
         }
 
-        public Bitmap ExcludeColorsOutsideRange(Bitmap image, Rectangle region, IntRange universalRange)
+        public Bitmap ExcludeColorsOutsideRange(Bitmap image, Rectangle region, IntRange universalRange, RGB fillColor = null)
         {
-            return ExcludeColorsOutsideRange(image, region, universalRange, universalRange, universalRange);
+            return ExcludeColorsOutsideRange(image, region, universalRange, universalRange, universalRange, fillColor);
         }
 
         public Bitmap ExcludeColorsOutsideRange(Bitmap image, Rectangle region, IntRange redRange, IntRange greenRange,
-            IntRange blueRange)
+            IntRange blueRange, RGB fillColor = null)
         {
+            if (fillColor == null) fillColor = new RGB(Color.Black);
+
             var target = CropBitmap(image, region);
 
             var filter = new ColorFiltering
             {
                 Red = redRange,
                 Green = greenRange,
-                Blue = blueRange
+                Blue = blueRange,
+                FillColor = fillColor
             };
 
             filter.ApplyInPlace(target);

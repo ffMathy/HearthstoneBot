@@ -25,19 +25,17 @@ namespace BotApplication.State
             _cardsInHand = new List<ICard>();
         }
 
-        public async Task AddCardPlayedAsync(ICard card)
+        public void AddCardPlayed(ICard card)
         {
             _cardsInHand.Remove(card);
             _cardsPlayed.Add(card);
             _logger.LogGameEvent(card.Name + " played by the bot.");
-            await Task.Delay(2000);
         }
 
-        public async Task AddCardToHandAsync(ICard card)
+        public void AddCardToHand(ICard card)
         {
             _cardsInHand.Add(card);
             _logger.LogGameEvent(card.Name + " added to the bot's hand.");
-            await Task.Delay(2000);
         }
     }
 }

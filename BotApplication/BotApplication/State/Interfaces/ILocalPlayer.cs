@@ -8,6 +8,6 @@ namespace BotApplication.State.Interfaces
     {
         IReadOnlyList<ICard> CardsInHand { get; }
 
-        Task AddCardToHandAsync(ICard card);
+        void AddCardToHand(ICard card);
     }
 }

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autofac;
+using Autofac.Builder;
 using BotApplication.Cards.Interfaces;
 using BotApplication.Helpers;
 using BotApplication.Interceptors;
@@ -40,6 +41,7 @@ namespace BotApplication
             RegisterSingleInstanceType<OcrHelper>(builder);
             RegisterSingleInstanceType<AggregateInterceptor>(builder);
             RegisterSingleInstanceType<GameState>(builder);
+            RegisterSingleInstanceType<Logger>(builder);
 
             builder.Register(c =>
                 {
@@ -57,12 +59,13 @@ namespace BotApplication
             Application.Run(container.Resolve<MainWindow>());
         }
 
-        private static void RegisterSingleInstanceType<T>(ContainerBuilder builder)
+        private static IRegistrationBuilder<T, ConcreteReflectionActivatorData, SingleRegistrationStyle> RegisterSingleInstanceType<T>(ContainerBuilder builder)
         {
-            builder.RegisterType<T>()
+            return builder.RegisterType<T>()
                 .AsSelf()
                 .AsImplementedInterfaces()
-                .SingleInstance();
+                .SingleInstance()
+                .AutoActivate();
         }
     }
 }
