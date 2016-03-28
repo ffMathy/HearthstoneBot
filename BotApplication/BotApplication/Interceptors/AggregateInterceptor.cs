@@ -56,7 +56,7 @@ namespace BotApplication.Interceptors
             var filter = new ColorFiltering(
                 new IntRange(minimum, 255),
                 new IntRange(minimum, 255),
-                new IntRange(250, 255));
+                new IntRange(minimum, 255));
             var ocrImage = filter.Apply(image);
 
             await standardInterceptorsTask;
