@@ -4,25 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BotApplication.Cards.Interfaces;
+using BotApplication.Helpers.Interfaces;
 using BotApplication.State.Interfaces;
 
 namespace BotApplication.State
 {
     class EnemyPlayer: IEnemyPlayer
     {
+        private readonly ILogger _logger;
         private readonly IList<ICard> _cardsPlayed;
 
         public IReadOnlyList<ICard> CardsPlayed => _cardsPlayed.ToArray();
 
-        public EnemyPlayer()
+        public EnemyPlayer(
+            ILogger logger)
         {
+            _logger = logger;
             _cardsPlayed = new List<ICard>();
         }
 
         public async Task AddCardPlayedAsync(ICard card)
         {
             _cardsPlayed.Add(card);
-            Console.WriteLine(card.Name + " played by the enemy.");
+            _logger.LogGameEvent(card.Name + " played by the enemy.");
             await Task.Delay(2000);
         }
     }

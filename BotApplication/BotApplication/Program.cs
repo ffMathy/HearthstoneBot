@@ -33,15 +33,20 @@ namespace BotApplication
 
             var builder = new ContainerBuilder();
 
-            builder.RegisterAssemblyTypes(typeof (Program).Assembly)
+            builder.RegisterAssemblyTypes(typeof(Program).Assembly)
                 .AsSelf()
                 .AsImplementedInterfaces();
-            
+
             RegisterSingleInstanceType<OcrHelper>(builder);
             RegisterSingleInstanceType<AggregateInterceptor>(builder);
             RegisterSingleInstanceType<GameState>(builder);
 
-            builder.Register(c => new TesseractEngine(Environment.CurrentDirectory, "hearthstone", EngineMode.Default))
+            builder.Register(c =>
+                {
+                    var engine = new TesseractEngine(Environment.CurrentDirectory, "hearthstone", EngineMode.Default);
+                    engine.SetVariable("tessedit_char_whitelist", "1234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ");
+                    return engine;
+                })
                 .AsSelf()
                 .SingleInstance();
 

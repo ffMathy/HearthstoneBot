@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using AForge.Imaging;
 using BotApplication.Events;
 using Tesseract;
 
@@ -11,6 +10,18 @@ namespace BotApplication.Helpers.Interfaces
         string GetTextInRegion(
             Bitmap image,
             Rect region);
+
+        string GetTextInRegion(
+            Bitmap image,
+            Rect region,
+            PageSegMode pageSegmentationMode);
+
+        string GetText(
+            Bitmap image);
+
+        string GetText(
+            Bitmap image,
+            PageSegMode pageSegmentationMode);
 
         event EventHandler<OcrTextScanPerformedEventArgs> OcrTextScanPerformed;
     }

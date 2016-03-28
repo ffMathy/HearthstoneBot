@@ -24,8 +24,6 @@ namespace BotApplication
     {
         private readonly IAggregateInterceptor _aggregateInterceptor;
 
-        private readonly OcrAnalyzerForm _ocrAnalyzerForm;
-
         private MainWindow()
         {
             
@@ -33,19 +31,25 @@ namespace BotApplication
 
         public MainWindow(
             IAggregateInterceptor aggregateInterceptor,
-            OcrAnalyzerForm ocrAnalyzerForm)
+            ImageDebuggerForm imageDebuggerForm)
         {
             _aggregateInterceptor = aggregateInterceptor;
-            _ocrAnalyzerForm = ocrAnalyzerForm;
 
+            imageDebuggerForm.Show();
+
+            Shown += MainWindow_Shown;
             Load += MainWindow_Load;
 
             InitializeComponent();
         }
 
+        private void MainWindow_Shown(object sender, EventArgs e)
+        {
+            Hide();
+        }
+
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            _ocrAnalyzerForm.Show();
             _aggregateInterceptor.StartAsync();
 
 

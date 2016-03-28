@@ -8,7 +8,7 @@ using Tesseract;
 
 namespace BotApplication.Interceptors
 {
-    public class EnemyPlayInterceptor: IOcrInterceptor
+    public class EnemyPlayInterceptor: IInterceptor
     {
         private readonly IEnemyPlayer _enemyPlayer;
         private readonly ICardScanner _cardScanner;
@@ -24,12 +24,12 @@ namespace BotApplication.Interceptors
             _gameState = gameState;
         }
 
-        public async Task OnImageReadyAsync(Bitmap image)
+        public async Task OnImageReadyAsync(Bitmap standardImage)
         {
             if (_gameState.IsGameStarted)
             {
                 var card =
-                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(image, new Point(299, 355));
+                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(standardImage, new Point(359, 347));
                 if (card != null)
                 {
                     await _enemyPlayer.AddCardPlayedAsync(card);

@@ -18,8 +18,7 @@ namespace BotApplication.Interceptors
 {
     public class AggregateInterceptor : IAggregateInterceptor
     {
-        private readonly IEnumerable<IStandardInterceptor> _standardInterceptors;
-        private readonly IEnumerable<IOcrInterceptor> _ocrInterceptors;
+        private readonly IEnumerable<IInterceptor> _interceptors;
 
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
@@ -28,14 +27,12 @@ namespace BotApplication.Interceptors
         static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
         public AggregateInterceptor(
-            IEnumerable<IStandardInterceptor> standardInterceptors,
-            IEnumerable<IOcrInterceptor> ocrInterceptors)
+            IEnumerable<IInterceptor> interceptors)
         {
-            _standardInterceptors = standardInterceptors;
-            _ocrInterceptors = ocrInterceptors;
+            _interceptors = interceptors;
         }
 
-        private string GetActiveWindowTitle()
+        private static string GetActiveWindowTitle()
         {
             const int nChars = 256;
             StringBuilder Buff = new StringBuilder(nChars);
@@ -50,30 +47,7 @@ namespace BotApplication.Interceptors
 
         private async Task PostFrame(Bitmap image)
         {
-            var standardInterceptorsTask = NotifyStandardInterceptorsAsync(image);
-
-            const int minimum = 200;
-            var filter = new ColorFiltering(
-                new IntRange(minimum, 255),
-                new IntRange(minimum, 255),
-                new IntRange(minimum, 255));
-            var ocrImage = filter.Apply(image);
-
-            await standardInterceptorsTask;
-            await NotifyOcrInterceptorsAsync(ocrImage);
-        }
-
-        private async Task NotifyOcrInterceptorsAsync(Bitmap image)
-        {
-            foreach (var interceptor in _ocrInterceptors)
-            {
-                await interceptor.OnImageReadyAsync(image);
-            }
-        }
-
-        private async Task NotifyStandardInterceptorsAsync(Bitmap image)
-        {
-            foreach (var interceptor in _standardInterceptors)
+            foreach (var interceptor in _interceptors)
             {
                 await interceptor.OnImageReadyAsync(image);
             }
@@ -88,14 +62,14 @@ namespace BotApplication.Interceptors
                 {
                     if (GetActiveWindowTitle() == "Hearthstone")
                     {
-                        var bounds = Screen.GetBounds(Point.Empty);
-                        using (var bitmap = new Bitmap(bounds.Width, bounds.Height))
+                        var bounds = Screen.GetWorkingArea(Point.Empty);
+                        var titleBarHeight = 0; //SystemInformation.CaptionHeight;
+                        using (var bitmap = new Bitmap(bounds.Width, bounds.Height - titleBarHeight))
                         {
                             using (var graphics = Graphics.FromImage(bitmap))
                             {
-                                graphics.CopyFromScreen(Point.Empty, Point.Empty, bounds.Size);
+                                graphics.CopyFromScreen(new Point(0, titleBarHeight), Point.Empty, bounds.Size);
                             }
-
                             await PostFrame(bitmap);
                         }
                     }

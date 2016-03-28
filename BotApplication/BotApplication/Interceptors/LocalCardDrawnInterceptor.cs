@@ -6,7 +6,7 @@ using BotApplication.State.Interfaces;
 
 namespace BotApplication.Interceptors
 {
-    public class LocalCardDrawnInterceptor: IOcrInterceptor
+    public class LocalCardDrawnInterceptor: IInterceptor
     {
         private readonly ILocalPlayer _localPlayer;
         private readonly ICardScanner _cardScanner;
@@ -22,12 +22,12 @@ namespace BotApplication.Interceptors
             _gameState = gameState;
         }
 
-        public async Task OnImageReadyAsync(Bitmap image)
+        public async Task OnImageReadyAsync(Bitmap standardImage)
         {
             if (_gameState.IsGameStarted)
             {
                 var card =
-                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(image, new Point(1540, 599));
+                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(standardImage, new Point(1540, 456));
                 if (card != null)
                 {
                     await _localPlayer.AddCardToHandAsync(card);

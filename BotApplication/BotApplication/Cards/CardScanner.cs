@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using AForge;
+using AForge.Imaging;
 using BotApplication.Cards.Interfaces;
 using BotApplication.Helpers.Interfaces;
 using Tesseract;
+using Point = System.Drawing.Point;
 
 namespace BotApplication.Cards
 {
@@ -13,45 +18,76 @@ namespace BotApplication.Cards
     {
         private readonly ICardAggregator _cardAggregator;
         private readonly IOcrHelper _ocrHelper;
+        private readonly IImageFilter _imageFilter;
 
-        private const int CardWidthPlayed = 400;
-        private const int CardHeightPlayed = 450;
+        private const int CardWidthPlayed = 345;
+        private const int CardHeightPlayed = 498;
 
         private const int CardWidthEarlyGame = 288;
         private const int CardHeightEarlyGame = 414;
 
-        private const int TextLabelHeightPlayed = 92;
         private const int TextLabelOffsetYPlayed = 192;
+        private const int TextLabelHeightPlayed = 92;
 
-        private const int TextLabelHeightEarlyGame = 64;
-        private const int TextLabelOffsetYEarlyGame = 184;
+        private const int TextLabelOffsetYEarlyGame = 150;
+        private const int TextLabelHeightEarlyGame = 55;
 
-        private const int GemWidthEarlyGame = 30;
-        private const int GemHeightEarlyGame = 43;
+        private const int GemWidthEarlyGame = 40;
+        private const int GemHeightEarlyGame = 50;
 
-        private const int GemOffsetXEarlyGame = 118;
-        private const int GemOffsetYEarlyGame = 225;
+        private const int GemOffsetXEarlyGame = 108;
+        private const int GemOffsetYEarlyGame = 195;
 
-        private const int ManaCostOffsetEarlyGame = -30;
-        private const int ManaCostOffsetSizeEarlyGame = 80;
+        private const int GemWidthPlayed = 48;
+        private const int GemHeightPlayed = 63;
+
+        private const int GemOffsetXPlayed = 150;
+        private const int GemOffsetYPlayed = 272;
+
+        private const int ManaCostOffsetXEarlyGame = 0;
+        private const int ManaCostOffsetYEarlyGame = 0;
+        private const int ManaCostSizeEarlyGame = 50;
+
+        private const int ManaCostOffsetXPlayed = 0;
+        private const int ManaCostOffsetYPlayed = 0;
+        private const int ManaCostSizePlayed = 68;
 
         public CardScanner(
             ICardAggregator cardAggregator,
-            IOcrHelper ocrHelper)
+            IOcrHelper ocrHelper,
+            IImageFilter imageFilter)
         {
             _cardAggregator = cardAggregator;
             _ocrHelper = ocrHelper;
+            _imageFilter = imageFilter;
         }
 
         private async Task<IEnumerable<ICard>> InferCardCandidatesOrderedByRelevancyFromImageCardLocationAsync(
             Bitmap image,
             Point location,
-            Point cardSize,
+            Size cardSize,
             int textLabelOffsetY,
-            int textLabelHeight)
+            int textLabelHeight,
+            Rectangle gemArea,
+            Rectangle manaCostArea)
         {
-            var name = _ocrHelper.GetTextInRegion(image,
-                new Rect(location.X, location.Y + textLabelOffsetY, cardSize.X, textLabelHeight));
+            var cardImage = _imageFilter.CropBitmap(image,
+                new Rectangle(location, cardSize));
+            if (!IsValidCard(cardImage, manaCostArea))
+            {
+                return null;
+            }
+
+            using (var graphics = Graphics.FromImage(cardImage))
+            {
+                graphics.FillRectangle(Brushes.Black, gemArea);
+            }
+
+            var textScanImage = _imageFilter.ExcludeColorsOutsideRange(cardImage,
+                new Rectangle(0, textLabelOffsetY, cardImage.Width, textLabelHeight), 
+                new IntRange(200, 255));
+
+            var name = _ocrHelper.GetTextInRegion(textScanImage, new Rect(0, 0, textScanImage.Width, textLabelHeight));
             if (name == null) return null;
 
             var cards = await _cardAggregator.GetCardCandidatesOrderedByRelevancyFromNameAsync(name);
@@ -62,48 +98,39 @@ namespace BotApplication.Cards
         {
             var candidates = await
                     InferCardCandidatesOrderedByRelevancyFromImageCardLocationAsync(image, location,
-                        new Point(CardWidthPlayed, CardHeightPlayed),
+                        new Size(CardWidthPlayed, CardHeightPlayed),
                         TextLabelOffsetYPlayed,
-                        TextLabelHeightPlayed);
+                        TextLabelHeightPlayed,
+                        new Rectangle(GemOffsetXPlayed, GemOffsetYPlayed, GemWidthPlayed, GemHeightPlayed),
+                        new Rectangle(ManaCostOffsetXPlayed, ManaCostOffsetYPlayed, ManaCostSizePlayed, ManaCostSizePlayed));
             return candidates?.FirstOrDefault();
         }
 
         public async Task<ICard> InferEarlyGameCardFromImageCardLocationAsync(Bitmap image, Point location)
         {
-            if (!IsValidCardAtLocation(image, location))
-            {
-                return null;
-            }
-
-            using (var graphics = Graphics.FromImage(image))
-            {
-                graphics.FillRectangle(Brushes.Black,
-                    location.X + GemOffsetXEarlyGame,
-                    location.Y + GemOffsetYEarlyGame,
-                    GemWidthEarlyGame,
-                    GemHeightEarlyGame);
-            }
             var candidates = await
                     InferCardCandidatesOrderedByRelevancyFromImageCardLocationAsync(image, location,
-                        new Point(CardWidthEarlyGame, CardHeightEarlyGame),
+                        new Size(CardWidthEarlyGame, CardHeightEarlyGame),
                         TextLabelOffsetYEarlyGame,
-                        TextLabelHeightEarlyGame);
+                        TextLabelHeightEarlyGame,
+                        new Rectangle(GemOffsetXEarlyGame, GemOffsetYEarlyGame, GemWidthEarlyGame, GemHeightEarlyGame),
+                        new Rectangle(ManaCostOffsetXEarlyGame, ManaCostOffsetYEarlyGame, ManaCostSizeEarlyGame, ManaCostSizeEarlyGame));
             return candidates?.FirstOrDefault(x => x.Collectible);
         }
 
-        private bool IsValidCardAtLocation(Bitmap image, Point location)
+        private bool IsValidCard(Bitmap image, Rectangle manaCostArea)
         {
-            //TODO: maybe try contrast increase dramatically in mana orb before analyzing it?
-            var manaCost = _ocrHelper.GetTextInRegion(image,
-                new Rect(location.X + ManaCostOffsetEarlyGame, location.Y + ManaCostOffsetEarlyGame + 25, ManaCostOffsetSizeEarlyGame, ManaCostOffsetSizeEarlyGame));
+            image = _imageFilter.ExcludeColorsOutsideRange(
+                image,
+                manaCostArea,
+                new IntRange(240, 255),
+                new IntRange(240, 255),
+                new IntRange(254, 255));
 
-            int result;
-            if (int.TryParse(manaCost, out result))
-            {
-                return true;
-            }
+            ImageDebuggerForm.DebugImage(image);
 
-            return false;
+            var statistics = new ImageStatistics(image);
+            return statistics.PixelsCountWithoutBlack > ManaCostSizeEarlyGame * 1.25;
         }
     }
 }

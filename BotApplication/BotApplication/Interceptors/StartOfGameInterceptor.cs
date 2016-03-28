@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ using Tesseract;
 
 namespace BotApplication.Interceptors
 {
-    class StartOfGameInterceptor : IOcrInterceptor
+    class StartOfGameInterceptor : IInterceptor
     {
         private readonly ILocalPlayer _player;
         private readonly ICardScanner _cardScanner;
@@ -39,14 +40,14 @@ namespace BotApplication.Interceptors
             _gameState.StartGame();
         }
 
-        public async Task OnImageReadyAsync(Bitmap image)
+        public async Task OnImageReadyAsync(Bitmap standardImage)
         {
             if (!_gameState.IsGameStarted)
             {
-                var fourStructureCard1 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(image, new Point(440, 469));
-                var fourStructureCard2 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(image, new Point(769, 469));
-                var fourStructureCard3 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(image, new Point(1105, 469));
-                var fourStructureCard4 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(image, new Point(1439, 469));
+                var fourStructureCard1 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(standardImage, new Point(440, 469));
+                var fourStructureCard2 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(standardImage, new Point(769, 469));
+                var fourStructureCard3 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(standardImage, new Point(1105, 469));
+                var fourStructureCard4 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(standardImage, new Point(1439, 469));
 
                 var isFourStructure = fourStructureCard1 != null && fourStructureCard2 != null && fourStructureCard3 != null && fourStructureCard4 != null;
                 if (isFourStructure)
@@ -58,9 +59,9 @@ namespace BotApplication.Interceptors
                         fourStructureCard4);
                 }
                 else {
-                    var threeStructureCard1 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(image, new Point(531, 469));
-                    var threeStructureCard2 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(image, new Point(956, 469));
-                    var threeStructureCard3 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(image, new Point(1382, 469));
+                    var threeStructureCard1 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(standardImage, new Point(531, 469));
+                    var threeStructureCard2 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(standardImage, new Point(956, 469));
+                    var threeStructureCard3 = await _cardScanner.InferEarlyGameCardFromImageCardLocationAsync(standardImage, new Point(1382, 469));
 
                     var isThreeStructure = threeStructureCard1 != null && threeStructureCard2 != null &&
                                            threeStructureCard3 != null;
@@ -70,6 +71,9 @@ namespace BotApplication.Interceptors
                             threeStructureCard1,
                             threeStructureCard2,
                             threeStructureCard3);
+                    } else if (Debugger.IsAttached)
+                    {
+                        _gameState.StartGame();
                     }
                 }
             }

@@ -7,6 +7,7 @@ namespace BotApplication.Interceptors.Interfaces
 {
     public interface IInterceptor
     {
-        Task OnImageReadyAsync(Bitmap image);
+        Task OnImageReadyAsync(
+            Bitmap standardImage);
     }
 }
