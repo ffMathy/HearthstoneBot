@@ -93,6 +93,7 @@ namespace BotApplication.Cards
 
         private bool IsValidCardAtLocation(Bitmap image, Point location)
         {
+            //TODO: maybe try contrast increase dramatically in mana orb before analyzing it?
             var manaCost = _ocrHelper.GetTextInRegion(image,
                 new Rect(location.X + ManaCostOffsetEarlyGame, location.Y + ManaCostOffsetEarlyGame + 25, ManaCostOffsetSizeEarlyGame, ManaCostOffsetSizeEarlyGame));
 

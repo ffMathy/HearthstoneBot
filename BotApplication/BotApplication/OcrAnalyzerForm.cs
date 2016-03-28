@@ -51,13 +51,13 @@ namespace BotApplication
         {
             _areasUsed.Add(e.Region);
             pictureBox1.Image = e.ImageUsed;
-            using (var graphics = Graphics.FromImage(pictureBox1.Image))
-            {
-                foreach (var rectangle in _areasUsed)
-                {
-                    graphics.DrawRectangle(Pens.Red, rectangle);
-                }
-            }
+            //using (var graphics = Graphics.FromImage(pictureBox1.Image))
+            //{
+            //    foreach (var rectangle in _areasUsed)
+            //    {
+            //        graphics.DrawRectangle(Pens.Red, rectangle);
+            //    }
+            //}
             Text = e.Text ?? Text;
         }
     }
