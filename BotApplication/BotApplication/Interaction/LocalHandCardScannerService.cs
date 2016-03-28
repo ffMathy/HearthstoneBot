@@ -64,18 +64,22 @@ namespace BotApplication.Interaction
 
                 var image = await WaitForNextFrame(_aggregateInterceptor.CurrentImage);
 
-                var startingPoint = new Point(1536, image.Height-3);
-                var destinationOffset = 488;
+                var mouseStartingPoint = new Point(1536, image.Height-3);
+                const int destinationXOffset = 488;
+                const int mouseYOffset = 50;
 
                 var lastBlankSpotRegion = default(Rectangle);
 
-                var x = startingPoint.X;
+                var x = mouseStartingPoint.X;
                 const int decrementFactor = 5;
-                while (x > destinationOffset)
+
+                _logger.LogGameEvent("Looking for regions inside cards.");
+
+                while (x > destinationXOffset)
                 {
                     x -= decrementFactor;
 
-                    var pixelSpotPoint = GeneratePixelSpotPoint(x, startingPoint);
+                    var pixelSpotPoint = new Point(x, mouseStartingPoint.Y);
 
                     var pixelSpotRegion = new Rectangle(pixelSpotPoint.X, pixelSpotPoint.Y, 2, 2);
                     if (lastBlankSpotRegion == default(Rectangle))
@@ -88,23 +92,26 @@ namespace BotApplication.Interaction
                     var isInsideCard = IsInsideCard(image, pixelSpotRegion);
                     if (isInsideCard)
                     {
+                        _logger.LogGameEvent("Inside region found.");
+                        _logger.LogGameEvent("Waiting until region is hovered.");
+
                         while (isInsideCard)
                         {
                             x -= decrementFactor;
 
-                            _mouseInteractor.MoveMouseHumanly(GeneratePixelSpotPoint(x, startingPoint));
+                            _mouseInteractor.MoveMouseHumanly(new Point(x, mouseStartingPoint.Y-mouseYOffset));
                             image = await WaitForNextFrame(image);
 
                             isInsideCard = IsInsideCard(image, pixelSpotRegion);
                         }
 
-                        _logger.LogGameEvent("Candidate detected.");
+                        _logger.LogGameEvent("Region hovered - analyzing card.");
 
                         await Task.Delay(2500);
 
                         image = await WaitForNextFrame(image);
 
-                        var cardPoint = new Point(x - 160, startingPoint.Y - 630);
+                        var cardPoint = new Point(x - 160, mouseStartingPoint.Y - 630);
                         var card = await _cardImageScanner.InferHoveredCardFromImageCardLocationAsync(
                             image,
                             cardPoint);
@@ -117,20 +124,19 @@ namespace BotApplication.Interaction
                             _logger.LogGameEvent("False positive.");
                         }
 
-                        _logger.LogGameEvent("Moving to next candidate.");
-
-                        var isSpotInsideCard = false;
-                        while (!isSpotInsideCard)
+                        _logger.LogGameEvent("Waiting until inside new card.");
+                        
+                        while (!isInsideCard)
                         {
                             x -= decrementFactor;
 
-                            _mouseInteractor.MoveMouseHumanly(GeneratePixelSpotPoint(x, startingPoint));
+                            _mouseInteractor.MoveMouseHumanly(new Point(x, mouseStartingPoint.Y - mouseYOffset));
                             image = await WaitForNextFrame(image);
 
-                            isSpotInsideCard = IsInsideCard(image, lastBlankSpotRegion);
+                            isInsideCard = IsInsideCard(image, lastBlankSpotRegion);
                         }
 
-                        _logger.LogGameEvent("Next candidate entry point found.");
+                        _logger.LogGameEvent("Inside new card.");
                     }
                     else
                     {
@@ -155,22 +161,15 @@ namespace BotApplication.Interaction
             return _aggregateInterceptor.CurrentImage;
         }
 
-        private static Point GeneratePixelSpotPoint(int x, Point startingPoint)
-        {
-            return new Point(x, startingPoint.Y);
-        }
-
         private bool IsInsideCard(Bitmap image, Rectangle pixelSpotRegion)
         {
-            bool isInsideCard;
             using (var pixelSpot = _imageFilter.ExcludeColorsOutsideRange(image,
                 pixelSpotRegion,
                 new IntRange(100, 255)))
             {
                 var statistics = new ImageStatistics(pixelSpot);
-                isInsideCard = statistics.PixelsCountWithoutBlack > 2;
+                return statistics.PixelsCountWithoutBlack > 2;
             }
-            return isInsideCard;
         }
 
         public void Start()
