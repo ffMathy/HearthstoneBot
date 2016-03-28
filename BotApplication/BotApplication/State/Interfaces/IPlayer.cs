@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BotApplication.Cards.Interfaces;
 
 namespace BotApplication.State.Interfaces
@@ -7,6 +8,6 @@ namespace BotApplication.State.Interfaces
     {
         IReadOnlyList<ICard> CardsPlayed { get; }
 
-        void AddCardPlayed(ICard card);
+        Task AddCardPlayedAsync(ICard card);
     }
 }

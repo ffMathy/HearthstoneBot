@@ -11,17 +11,28 @@ namespace BotApplication.Cards
         public Card(
             string name, 
             string imageUrl, 
-            long id)
+            long id, 
+            bool collectible, 
+            int? attack, 
+            int? health)
         {
             Name = name;
             ImageUrl = imageUrl;
             Id = id;
+            Collectible = collectible;
+            Attack = attack;
+            Health = health;
         }
 
         public string Name { get; }
 
         [JsonProperty(PropertyName = "image_url")]
         public string ImageUrl { get; }
+
+        public bool Collectible { get; }
+
+        public int? Attack { get; }
+        public int? Health { get; }
 
         public long Id { get; }
 

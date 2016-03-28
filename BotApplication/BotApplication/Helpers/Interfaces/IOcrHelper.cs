@@ -1,5 +1,7 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using AForge.Imaging;
+using BotApplication.Events;
 using Tesseract;
 
 namespace BotApplication.Helpers.Interfaces
@@ -9,5 +11,7 @@ namespace BotApplication.Helpers.Interfaces
         string GetTextInRegion(
             Bitmap image,
             Rect region);
+
+        event EventHandler<OcrTextScanPerformedEventArgs> OcrTextScanPerformed;
     }
 }

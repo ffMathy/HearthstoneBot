@@ -22,8 +22,9 @@ namespace BotApplication
 {
     public partial class MainWindow : Form
     {
-        private readonly ICardAggregator _cardAggregator;
         private readonly IAggregateInterceptor _aggregateInterceptor;
+
+        private readonly OcrAnalyzerForm _ocrAnalyzerForm;
 
         private MainWindow()
         {
@@ -31,11 +32,11 @@ namespace BotApplication
         }
 
         public MainWindow(
-            ICardAggregator cardAggregator,
-            IAggregateInterceptor aggregateInterceptor)
+            IAggregateInterceptor aggregateInterceptor,
+            OcrAnalyzerForm ocrAnalyzerForm)
         {
-            _cardAggregator = cardAggregator;
             _aggregateInterceptor = aggregateInterceptor;
+            _ocrAnalyzerForm = ocrAnalyzerForm;
 
             Load += MainWindow_Load;
 
@@ -44,6 +45,7 @@ namespace BotApplication
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
+            _ocrAnalyzerForm.Show();
             _aggregateInterceptor.StartAsync();
 
 

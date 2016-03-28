@@ -1,25 +1,23 @@
 ﻿using System.Drawing;
 using System.Threading.Tasks;
 using BotApplication.Cards.Interfaces;
-using BotApplication.Helpers.Interfaces;
 using BotApplication.Interceptors.Interfaces;
 using BotApplication.State.Interfaces;
-using Tesseract;
 
 namespace BotApplication.Interceptors
 {
-    public class EnemyPlayInterceptor: IOcrInterceptor
+    public class LocalCardDrawnInterceptor: IOcrInterceptor
     {
-        private readonly IEnemyPlayer _enemyPlayer;
+        private readonly ILocalPlayer _localPlayer;
         private readonly ICardScanner _cardScanner;
         private readonly IGameState _gameState;
 
-        public EnemyPlayInterceptor(
-            IEnemyPlayer enemyPlayer,
+        public LocalCardDrawnInterceptor(
+            ILocalPlayer localPlayer,
             ICardScanner cardScanner,
             IGameState gameState)
         {
-            _enemyPlayer = enemyPlayer;
+            _localPlayer = localPlayer;
             _cardScanner = cardScanner;
             _gameState = gameState;
         }
@@ -29,10 +27,10 @@ namespace BotApplication.Interceptors
             if (_gameState.IsGameStarted)
             {
                 var card =
-                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(image, new Point(299, 355));
+                    await _cardScanner.InferPlayedCardFromImageCardLocationAsync(image, new Point(1540, 599));
                 if (card != null)
                 {
-                    await _enemyPlayer.AddCardPlayedAsync(card);
+                    await _localPlayer.AddCardToHandAsync(card);
                 }
             }
         }

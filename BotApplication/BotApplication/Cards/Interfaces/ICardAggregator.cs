@@ -7,6 +7,6 @@ namespace BotApplication.Cards.Interfaces
     {
         Task<IReadOnlyList<ICard>> LoadCardsAsync();
 
-        Task<ICard> GetCardByNameAsync(string name);
+        Task<IEnumerable<ICard>> GetCardCandidatesOrderedByRelevancyFromNameAsync(string name);
     }
 }

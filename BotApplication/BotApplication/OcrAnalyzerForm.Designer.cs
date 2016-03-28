@@ -1,6 +1,6 @@
 ﻿namespace BotApplication
 {
-    partial class MainWindow
+    partial class OcrAnalyzerForm
     {
         /// <summary>
         /// Required designer variable.
@@ -34,23 +34,24 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(12, 12);
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1285, 859);
+            this.pictureBox1.Size = new System.Drawing.Size(1, 1);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
-            // MainWindow
+            // OcrAnalyzerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1309, 883);
+            this.ClientSize = new System.Drawing.Size(106, 68);
             this.Controls.Add(this.pictureBox1);
-            this.Name = "MainWindow";
-            this.Text = "Form1";
-            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.Name = "OcrAnalyzerForm";
+            this.Text = "OcrAnalyzerForm";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -62,4 +63,3 @@
         private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
-
