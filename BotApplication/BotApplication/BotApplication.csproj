@@ -146,6 +146,18 @@
     <None Include="node_modules\hearthstone-db\cards\all-cards.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="node_modules\hearthstone-db\cards\all-collectibles.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="node_modules\hearthstone-db\cards\brm.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="node_modules\hearthstone-db\cards\gvg.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="node_modules\hearthstone-db\cards\naxxramas.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="package.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

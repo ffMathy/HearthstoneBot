@@ -25,19 +25,35 @@ namespace BotApplication.Cards
         {
             if (_cards != null) return _cards;
 
-            var json = File.ReadAllText(
-                @"node_modules\hearthstone-db\cards\all-cards.json");
-            var cardInformation = await Task.Factory.StartNew(() => 
-                JsonConvert.DeserializeObject<CardListInformation>(json));
+            var finalCards = new List<Card>();
+            foreach (var file in Directory.GetFiles(@"node_modules\hearthstone-db\cards", "*.json"))
+            {
+                var cardInformation = await LoadCardInformation(file);
+                foreach (var card in cardInformation.Cards)
+                {
+                    if (finalCards.All(x => x.Name != card.Name))
+                    {
+                        finalCards.Add(card);
+                    }
+                }
+            }
 
-            foreach (var card in cardInformation.Cards)
+            foreach (var card in finalCards)
             {
                 card.PlayStrategies = _playStrategies
                     .Where(x => x.FitsCard(card))
                     .ToArray();
             }
 
-            return _cards = cardInformation.Cards;
+            return _cards = finalCards;
+        }
+
+        private static async Task<CardListInformation> LoadCardInformation(string file)
+        {
+            var json = File.ReadAllText(file);
+            var cardInformation = await Task.Factory.StartNew(() =>
+                JsonConvert.DeserializeObject<CardListInformation>(json));
+            return cardInformation;
         }
 
         public async Task<IEnumerable<ICard>> GetCardCandidatesOrderedByRelevancyFromNameAsync(string name)

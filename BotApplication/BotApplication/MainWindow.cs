@@ -48,9 +48,9 @@ namespace BotApplication
             Hide();
         }
 
-        private void MainWindow_Load(object sender, EventArgs e)
+        private async void MainWindow_Load(object sender, EventArgs e)
         {
-            _aggregateInterceptor.StartAsync();
+            await _aggregateInterceptor.StartAsync();
 
 
             //var originalImage = _imageConverter.ConvertToFormat(new Bitmap(@"C:\Users\mathi\OneDrive\Billeder\Screenshots\2016-03-27 (4).png"), PixelFormat.Format24bppRgb);

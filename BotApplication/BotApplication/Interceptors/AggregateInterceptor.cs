@@ -35,14 +35,10 @@ namespace BotApplication.Interceptors
         private static string GetActiveWindowTitle()
         {
             const int nChars = 256;
-            StringBuilder Buff = new StringBuilder(nChars);
-            IntPtr handle = GetForegroundWindow();
+            var buffer = new StringBuilder(nChars);
+            var handle = GetForegroundWindow();
 
-            if (GetWindowText(handle, Buff, nChars) > 0)
-            {
-                return Buff.ToString();
-            }
-            return null;
+            return GetWindowText(handle, buffer, nChars) > 0 ? buffer.ToString() : null;
         }
 
         private async Task PostFrame(Bitmap image)
@@ -55,30 +51,33 @@ namespace BotApplication.Interceptors
 
         public async Task StartAsync()
         {
-            while (true)
+            await Task.Factory.StartNew(async () =>
             {
-                await Task.Delay(1000);
-                try
+                while (true)
                 {
-                    if (GetActiveWindowTitle() == "Hearthstone")
+                    await Task.Delay(1000);
+                    try
                     {
-                        var bounds = Screen.GetWorkingArea(Point.Empty);
-                        var titleBarHeight = 0; //SystemInformation.CaptionHeight;
-                        using (var bitmap = new Bitmap(bounds.Width, bounds.Height - titleBarHeight))
+                        if (GetActiveWindowTitle() == "Hearthstone")
                         {
-                            using (var graphics = Graphics.FromImage(bitmap))
+                            var bounds = Screen.GetWorkingArea(Point.Empty);
+                            var titleBarHeight = 0; //SystemInformation.CaptionHeight;
+                            using (var bitmap = new Bitmap(bounds.Width, bounds.Height - titleBarHeight))
                             {
-                                graphics.CopyFromScreen(new Point(0, titleBarHeight), Point.Empty, bounds.Size);
+                                using (var graphics = Graphics.FromImage(bitmap))
+                                {
+                                    graphics.CopyFromScreen(new Point(0, titleBarHeight), Point.Empty, bounds.Size);
+                                }
+                                await PostFrame(bitmap);
                             }
-                            await PostFrame(bitmap);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }
+            }, TaskCreationOptions.LongRunning);
         }
     }
 }

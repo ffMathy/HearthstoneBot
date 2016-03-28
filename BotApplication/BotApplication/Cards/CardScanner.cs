@@ -36,7 +36,7 @@ namespace BotApplication.Cards
         private const int GemHeightEarlyGame = 50;
 
         private const int GemOffsetXEarlyGame = 108;
-        private const int GemOffsetYEarlyGame = 195;
+        private const int GemOffsetYEarlyGame = 206;
 
         private const int GemWidthPlayed = 48;
         private const int GemHeightPlayed = 63;
@@ -83,6 +83,8 @@ namespace BotApplication.Cards
                 graphics.FillRectangle(Brushes.Black, gemArea);
             }
 
+            ImageDebuggerForm.DebugImage(cardImage);
+
             var textScanImage = _imageFilter.ExcludeColorsOutsideRange(cardImage,
                 new Rectangle(0, textLabelOffsetY, cardImage.Width, textLabelHeight), 
                 new IntRange(200, 255));
@@ -126,8 +128,6 @@ namespace BotApplication.Cards
                 new IntRange(240, 255),
                 new IntRange(240, 255),
                 new IntRange(254, 255));
-
-            ImageDebuggerForm.DebugImage(image);
 
             var statistics = new ImageStatistics(image);
             return statistics.PixelsCountWithoutBlack > ManaCostSizeEarlyGame * 1.25;

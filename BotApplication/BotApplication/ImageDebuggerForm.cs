@@ -39,6 +39,7 @@ namespace BotApplication
             image.Save(_offset++ + ".png");
             Images.Enqueue(image);
             Thread.Sleep(250);
+            Application.DoEvents();
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -46,6 +47,7 @@ namespace BotApplication
             if (Images.Count > 0)
             {
                 pictureBox.Image = Images.Dequeue();
+                Application.DoEvents();
             }
         }
     }

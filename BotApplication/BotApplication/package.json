@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "hearthstone-db": "latest"
+    "hearthstone-db": "git+https://github.com/pdyck/hearthstone-db.git"
   },
   "devDependencies": {},
   "author": "",

@@ -44,7 +44,7 @@ namespace BotApplication
             builder.Register(c =>
                 {
                     var engine = new TesseractEngine(Environment.CurrentDirectory, "hearthstone", EngineMode.Default);
-                    engine.SetVariable("tessedit_char_whitelist", "1234567890abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ");
+                    engine.SetVariable("tessedit_char_whitelist", "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
                     return engine;
                 })
                 .AsSelf()
