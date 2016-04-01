@@ -27,6 +27,7 @@ namespace BotApplication.Interaction
         private readonly ILogger _logger;
         private readonly IAggregateInterceptor _aggregateInterceptor;
         private readonly IImageFilter _imageFilter;
+        private readonly ILocalPlayer _localPlayer;
 
         public LocalHandCardScannerService(
             ICardImageScanner cardImageScanner,
@@ -34,7 +35,8 @@ namespace BotApplication.Interaction
             IGameState gameState,
             ILogger logger,
             IAggregateInterceptor aggregateInterceptor,
-            IImageFilter imageFilter)
+            IImageFilter imageFilter,
+            ILocalPlayer localPlayer)
         {
             _cardImageScanner = cardImageScanner;
             _mouseInteractor = mouseInteractor;
@@ -42,12 +44,14 @@ namespace BotApplication.Interaction
             _logger = logger;
             _aggregateInterceptor = aggregateInterceptor;
             _imageFilter = imageFilter;
+            _localPlayer = localPlayer;
 
             gameState.TurnChanged += GameState_TurnChanged;
         }
 
         private async void GameState_TurnChanged(object sender, EventArgs e)
         {
+            await Task.Delay(3000);
             await RunCardScanIfNeeded();
         }
 
@@ -55,7 +59,10 @@ namespace BotApplication.Interaction
         {
             if (_gameState.CurrentTurn == Turn.Local)
             {
+                var currentMousePosition = _mouseInteractor.CurrentLocation;
+
                 _logger.LogGameEvent("Scanning for cards in hand.");
+                _localPlayer.ClearCardsInHand();
 
                 while (_aggregateInterceptor.CurrentImage == null)
                 {
@@ -64,111 +71,106 @@ namespace BotApplication.Interaction
 
                 var image = await WaitForNextFrame(_aggregateInterceptor.CurrentImage);
 
-                var mouseStartingPoint = new Point(1536, image.Height-3);
+                var mouseStartingPoint = new Point(1536, 1332);
                 const int destinationXOffset = 488;
-                const int mouseYOffset = 50;
+                const int mouseYOffset = 30;
 
                 var lastBlankSpotRegion = default(Rectangle);
 
                 var x = mouseStartingPoint.X;
-                const int decrementFactor = 5;
+                const int decrementFactor = 30;
 
-                _logger.LogGameEvent("Looking for regions inside cards.");
-
-                while (x > destinationXOffset)
+                bool isInsideCard = false;
+                while (!isInsideCard && x > destinationXOffset)
                 {
                     x -= decrementFactor;
 
                     var pixelSpotPoint = new Point(x, mouseStartingPoint.Y);
 
-                    var pixelSpotRegion = new Rectangle(pixelSpotPoint.X, pixelSpotPoint.Y, 2, 2);
+                    var pixelSpotRegion = new Rectangle(pixelSpotPoint.X, pixelSpotPoint.Y, 5, 5);
                     if (lastBlankSpotRegion == default(Rectangle))
                     {
                         lastBlankSpotRegion = pixelSpotRegion;
                     }
 
+                    _mouseInteractor.MoveMouseHumanly(new Point(x, mouseStartingPoint.Y + mouseYOffset));
                     image = await WaitForNextFrame(image);
 
-                    var isInsideCard = IsInsideCard(image, pixelSpotRegion);
+                    isInsideCard = IsInsideCard(image, pixelSpotRegion);
                     if (isInsideCard)
                     {
-                        _logger.LogGameEvent("Inside region found.");
-                        _logger.LogGameEvent("Waiting until region is hovered.");
+                        var matches = new List<ICard>();
 
-                        while (isInsideCard)
+                        var cardOffsetY = 0;
+                        for (var cardOffsetX = 0; cardOffsetX <= 40; cardOffsetX += 20)
                         {
-                            x -= decrementFactor;
-
-                            _mouseInteractor.MoveMouseHumanly(new Point(x, mouseStartingPoint.Y-mouseYOffset));
-                            image = await WaitForNextFrame(image);
-
-                            isInsideCard = IsInsideCard(image, pixelSpotRegion);
+                            var cardPoint = new Point(x - 140 - cardOffsetX, mouseStartingPoint.Y - 570 - cardOffsetY);
+                            var card = await _cardImageScanner.InferHoveredCardFromImageCardLocationAsync(
+                                image,
+                                cardPoint);
+                            if (card.Match != null)
+                            {
+                                matches.Add(card.Match);
+                                break;
+                            }
                         }
 
-                        _logger.LogGameEvent("Region hovered - analyzing card.");
-
-                        await Task.Delay(2500);
-
-                        image = await WaitForNextFrame(image);
-
-                        var cardPoint = new Point(x - 160, mouseStartingPoint.Y - 630);
-                        var card = await _cardImageScanner.InferHoveredCardFromImageCardLocationAsync(
-                            image,
-                            cardPoint);
-                        if (card.Match != null)
+                        if (matches.Count > 0)
                         {
-                            _logger.LogGameEvent("Found " + card.Match.Name + " in hand.");
+                            _localPlayer.AddCardToHand(matches
+                                .OrderByDescending(c => c.Name.Length)
+                                .First());
                         }
                         else
                         {
                             _logger.LogGameEvent("False positive.");
                         }
 
-                        _logger.LogGameEvent("Waiting until inside new card.");
-                        
-                        while (!isInsideCard)
+                        while (isInsideCard && x > destinationXOffset)
                         {
                             x -= decrementFactor;
 
-                            _mouseInteractor.MoveMouseHumanly(new Point(x, mouseStartingPoint.Y - mouseYOffset));
+                            _mouseInteractor.MoveMouseHumanly(new Point(x, mouseStartingPoint.Y + mouseYOffset));
                             image = await WaitForNextFrame(image);
 
-                            isInsideCard = IsInsideCard(image, lastBlankSpotRegion);
+                            isInsideCard = IsInsideCard(image, pixelSpotRegion);
                         }
 
-                        _logger.LogGameEvent("Inside new card.");
+                        lastBlankSpotRegion = pixelSpotRegion;
+
+                        image = await WaitForNextFrame(image);
                     }
                     else
                     {
                         lastBlankSpotRegion = pixelSpotRegion;
-                        //using (var originalImage = _imageFilter.CropBitmap(image, pixelSpotRegion))
-                        //{
-                        //    ImageDebuggerForm.DebugImage(originalImage);
-                        //}
                     }
                 }
-            }
 
-            _logger.LogGameEvent("Hand card scan completed.");
+                _mouseInteractor.MoveMouseHumanly(currentMousePosition);
+                _logger.LogGameEvent("Hand card scan completed.");
+            }
         }
 
         private async Task<Bitmap> WaitForNextFrame(Bitmap currentImage)
         {
             while (currentImage == _aggregateInterceptor.CurrentImage)
             {
-                await Task.Delay(25);
+                await Task.Delay(1);
             }
             return _aggregateInterceptor.CurrentImage;
         }
 
         private bool IsInsideCard(Bitmap image, Rectangle pixelSpotRegion)
         {
+            var normalRange = new IntRange(0, 150);
             using (var pixelSpot = _imageFilter.ExcludeColorsOutsideRange(image,
                 pixelSpotRegion,
-                new IntRange(100, 255)))
+                normalRange,
+                normalRange,
+                new IntRange(150, 255)))
             {
                 var statistics = new ImageStatistics(pixelSpot);
-                return statistics.PixelsCountWithoutBlack > 2;
+                return statistics.PixelsCountWithoutBlack > 3;
             }
         }
 

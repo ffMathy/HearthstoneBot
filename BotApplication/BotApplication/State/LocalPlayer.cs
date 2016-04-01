@@ -37,5 +37,10 @@ namespace BotApplication.State
             _cardsInHand.Add(card);
             _logger.LogGameEvent(card.Name + " added to the bot's hand.");
         }
+
+        public void ClearCardsInHand()
+        {
+            _cardsInHand.Clear();
+        }
     }
 }

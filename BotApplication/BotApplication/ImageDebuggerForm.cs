@@ -37,18 +37,30 @@ namespace BotApplication
         public static void DebugImage(Bitmap image)
         {
             image.Save(_offset++ + ".png");
-            Images.Enqueue(image);
-            Thread.Sleep(1000);
+            lock (Images)
+            {
+                Images.Enqueue(image);
+            }
+            Thread.Sleep(25);
             Application.DoEvents();
         }
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            if (Images.Count > 0)
+            lock (Images)
             {
-                pictureBox.Image = Images.Dequeue();
-                Application.DoEvents();
+                if (Images.Count > 0)
+                {
+                    try
+                    {
+                        //pictureBox.Image = Images.Dequeue();
+                    } catch
+                    {
+
+                    }
+                }
             }
+            Application.DoEvents();
         }
     }
 }

@@ -9,5 +9,6 @@ namespace BotApplication.State.Interfaces
         IReadOnlyList<ICard> CardsInHand { get; }
 
         void AddCardToHand(ICard card);
+        void ClearCardsInHand();
     }
 }

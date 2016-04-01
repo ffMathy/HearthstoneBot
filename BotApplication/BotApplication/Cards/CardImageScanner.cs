@@ -102,14 +102,15 @@ namespace BotApplication.Cards
             using (var cardImage = _imageFilter.CropBitmap(image,
                 new Rectangle(location, cardSize)))
             {
-                if (!IsValidCard(cardImage, manaCostArea))
-                {
-                    return Tuple.Create<Rectangle, ICard[]>(default(Rectangle), null);
-                }
-
                 using (var graphics = Graphics.FromImage(cardImage))
                 {
                     graphics.FillRectangle(Brushes.Black, gemArea);
+                }
+
+                if (!IsValidCard(cardImage, manaCostArea))
+                {
+                    ImageDebuggerForm.DebugImage(cardImage);
+                    return Tuple.Create<Rectangle, ICard[]>(default(Rectangle), null);
                 }
 
                 using (var textScanImage = _imageFilter.ExcludeColorsOutsideRange(cardImage,
@@ -192,15 +193,29 @@ namespace BotApplication.Cards
 
         private bool IsValidCard(Bitmap image, Rectangle manaCostArea)
         {
-            image = _imageFilter.ExcludeColorsOutsideRange(
+            using (var regularManaImage = _imageFilter.ExcludeColorsOutsideRange(
                 image,
                 manaCostArea,
                 new IntRange(240, 255),
                 new IntRange(240, 255),
-                new IntRange(254, 255));
+                new IntRange(254, 255)))
+            {
+                using (var redManaImage = _imageFilter.ExcludeColorsOutsideRange(
+                    image,
+                    manaCostArea,
+                    new IntRange(254, 255),
+                    new IntRange(0, 1),
+                    new IntRange(0, 1)))
+                {
+                    return IsValidManaCrystal(regularManaImage) || IsValidManaCrystal(redManaImage);
+                }
+            }
+        }
 
+        private static bool IsValidManaCrystal(Bitmap image)
+        {
             var statistics = new ImageStatistics(image);
-            return statistics.PixelsCountWithoutBlack > ManaCostSizeEarlyGame * 1.25;
+            return statistics.PixelsCountWithoutBlack > ManaCostSizeEarlyGame;
         }
     }
 }
