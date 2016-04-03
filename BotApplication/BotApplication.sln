@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotApplication.Undetectable
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotApplication.Strategies", "BotApplication.Strategies\BotApplication.Strategies.csproj", "{DC638513-13CB-42FD-9192-82D2912A8F68}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotApplication.Detectable", "BotApplication.Detectable\BotApplication.Detectable.csproj", "{D064C15F-D910-4B10-9A70-3382BBAE9CAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DC638513-13CB-42FD-9192-82D2912A8F68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC638513-13CB-42FD-9192-82D2912A8F68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC638513-13CB-42FD-9192-82D2912A8F68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D064C15F-D910-4B10-9A70-3382BBAE9CAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D064C15F-D910-4B10-9A70-3382BBAE9CAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D064C15F-D910-4B10-9A70-3382BBAE9CAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D064C15F-D910-4B10-9A70-3382BBAE9CAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
