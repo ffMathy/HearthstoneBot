@@ -99,6 +99,7 @@
     <Compile Include="Events\OcrTextScanPerformedEventArgs.cs" />
     <Compile Include="Helpers\Interfaces\IImageFilter.cs" />
     <Compile Include="Helpers\Interfaces\IOcrHelper.cs" />
+    <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\OcrHelper.cs" />
     <Compile Include="Helpers\OcrResult.cs" />
     <Compile Include="ImageDebuggerForm.cs">
@@ -194,12 +195,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BotApplication.Strategies\BotApplication.Strategies.csproj">
-      <Project>{DC638513-13CB-42FD-9192-82D2912A8F68}</Project>
-      <Name>BotApplication.Strategies</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <Import Project="..\BotApplication.Shared\BotApplication.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">

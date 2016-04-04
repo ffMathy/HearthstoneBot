@@ -7,9 +7,7 @@ namespace BotApplication.Strategies.State
     public class GameState: IGameState
     {
         private readonly ILogger _logger;
-
-        public event EventHandler TurnChanged;
-
+        
         public bool IsGameStarted { get; private set; }
 
         public Turn CurrentTurn { get; private set; }
@@ -31,13 +29,6 @@ namespace BotApplication.Strategies.State
 
             _logger.LogGameEvent("It is now the " + (turn == Turn.Local ? "bot's" : "enemy's") + " turn.");
             CurrentTurn = turn;
-
-            RaiseTurnChangedEvent();
-        }
-
-        private void RaiseTurnChangedEvent()
-        {
-            TurnChanged?.Invoke(this, new EventArgs());
         }
     }
 }

@@ -1,22 +1,27 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Forms;
-using UnityEngine;
+﻿//using Autofac;
+//using BotApplication.Strategies.Interfaces;
+//using Autofac.Builder;
+
+using Bot.Interceptors;
+using System;
+using System.Runtime.CompilerServices;
+
+using MeGameState = BotApplication.Strategies.State.GameState;
 
 namespace Bot
 {
     public class Loader
     {
+        [MethodImpl(MethodImplOptions.PreserveSig)]
         public static void Load()
         {
-            var cards = GameState.Get().GetCurrentPlayer().GetHandZone().GetCards();
-            foreach (var card in cards)
-            {
-                Alert(card.ToString());
-            }
+            var gameState = new MeGameState(new DummyLogger());
 
-            EndTurnButton.Get().OnEndTurnRequested();
-            //SceneMgr.Get().RegisterSceneLoadedEvent(Callback);
+            var program = new Program(new[]
+            {
+                new GameStateInterceptor(gameState)
+            });
+            program.Run();
         }
 
         private static void Alert(string alert)
@@ -26,11 +31,6 @@ namespace Bot
 
         public static void Unload()
         {
-        }
-
-        private static void Callback(SceneMgr.Mode mode, Scene scene, object userdata)
-        {
-            //Alert(mode.ToString());
         }
     }
 }

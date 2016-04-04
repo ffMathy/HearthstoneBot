@@ -43,8 +43,6 @@ namespace BotApplication.Interaction
             _aggregateInterceptor = aggregateInterceptor;
             _imageFilter = imageFilter;
             _localPlayer = localPlayer;
-
-            gameState.TurnChanged += GameState_TurnChanged;
         }
 
         private async void GameState_TurnChanged(object sender, EventArgs e)

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>0ba8f6e3-7b2a-48d2-a821-5033da1522ef</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>BotApplication.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Card.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ICard.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ILogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPlayStrategy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\EnemyPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\GameState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\Interfaces\IEnemyPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\Interfaces\IGameState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\Interfaces\ILocalPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\Interfaces\IPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\LocalPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)State\Turn.cs" />
+  </ItemGroup>
+</Project>
